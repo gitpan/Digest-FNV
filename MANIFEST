@@ -1,0 +1,11 @@
+Changes
+FNV.pm
+FNV.xs
+fnvlib/fnv.h
+fnvlib/fnv.c
+fnvlib/Makefile.PL
+Makefile.PL
+MANIFEST
+README
+typemap
+t/test.t
