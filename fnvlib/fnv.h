@@ -1,8 +1,8 @@
 /*
  * fnv - Fowler/Noll/Vo- hash code
  *
- * @(#) $Revision: 1.5 $
- * @(#) $Id: fnv.h,v 1.5 2003/10/03 20:35:52 chongo Exp $
+ * @(#) $Revision: 5.4 $
+ * @(#) $Id: fnv.h,v 5.4 2009/07/30 22:49:13 chongo Exp $
  * @(#) $Source: /usr/local/src/cmd/fnv/RCS/fnv.h,v $
  *
  ***
@@ -34,7 +34,7 @@
  ***
  *
  * NOTE: The FNV-0 historic hash is not recommended.  One should use
- *   the FNV-1 hash instead.
+ *	 the FNV-1 hash instead.
  *
  * To use the 32 bit FNV-0 historic hash, pass FNV0_32_INIT as the
  * Fnv32_t hashval argument to fnv_32_buf() or fnv_32_str().
@@ -51,7 +51,7 @@
  * To use the recommended 32 bit FNV-1a hash, pass FNV1_32A_INIT as the
  * Fnv32_t hashval argument to fnv_32a_buf() or fnv_32a_str().
  *
- * To use the recommended 64 bit FNV-1a hash, pass FNV1_64A_INIT as the
+ * To use the recommended 64 bit FNV-1a hash, pass FNV1A_64_INIT as the
  * Fnv64_t hashval argument to fnv_64a_buf() or fnv_64a_str().
  *
  ***
@@ -67,20 +67,24 @@
  * PERFORMANCE OF THIS SOFTWARE.
  *
  * By:
- *  chongo <Landon Curt Noll> /\oo/\
+ *	chongo <Landon Curt Noll> /\oo/\
  *      http://www.isthe.com/chongo/
  *
- * Share and Enjoy! :-)
+ * Share and Enjoy!	:-)
  */
 
 #if !defined(__FNV_H__)
 #define __FNV_H__
 
+#include <sys/types.h>
+
+#define FNV_VERSION "5.0.2"	/* @(#) FNV Version */
+
 
 /*
  * 32 bit FNV-0 hash type
  */
-typedef unsigned long Fnv32_t;
+typedef u_int32_t Fnv32_t;
 
 
 /*
@@ -89,7 +93,7 @@ typedef unsigned long Fnv32_t;
  * This historic hash is not recommended.  One should use
  * the FNV-1 hash and initial basis instead.
  */
-/* #define FNV0_32_INIT ((Fnv32_t)0) */
+#define FNV0_32_INIT ((Fnv32_t)0)
 
 
 /*
@@ -107,25 +111,15 @@ typedef unsigned long Fnv32_t;
 #define FNV1_32_INIT ((Fnv32_t)0x811c9dc5)
 #define FNV1_32A_INIT FNV1_32_INIT
 
-
-/*
- * determine how 64 bit unsigned values are represented
- */
-/* #include "longlong.h" */
-
-
 /*
  * 64 bit FNV-0 hash
  */
-/*
- * #if defined(HAVE_64BIT_LONG_LONG)
- * typedef unsigned long long Fnv64_t;
- * #else
- * typedef struct {
- *     unsigned long w32[2];
- * } Fnv64_t;
- * #endif
-*/
+typedef struct {
+    //u_int32_t w32[2]; /* w32[0] is low order, w32[1] is high order word */
+    u_int32_t lower;
+    u_int32_t upper;
+} Fnv64_t;
+
 
 /*
  * 64 bit FNV-0 zero initial basis
@@ -133,14 +127,12 @@ typedef unsigned long Fnv32_t;
  * This historic hash is not recommended.  One should use
  * the FNV-1 hash and initial basis instead.
  */
-/*
- * #if defined(HAVE_64BIT_LONG_LONG)
- * #define FNV0_64_INIT ((Fnv64_t)0)
- * #else
- * extern const Fnv64_t fnv1_64_init;
- * #define FNV0_64_INIT (fnv1_64_init)
- * #endif
- */
+#define FNV1_64_LOWER 0x84222325UL
+#define FNV1_64_UPPER 0xcbf29ce4UL
+#define FNV1A_64_LOWER 0x84222325UL
+#define FNV1A_64_UPPER 0xcbf29ce4UL
+
+
 
 /*
  * 64 bit FNV-1 non-zero initial basis
@@ -154,33 +146,20 @@ typedef unsigned long Fnv32_t;
  *
  * NOTE: The FNV-1a initial basis is the same value as FNV-1 by definition.
  */
-/*
- *#if defined(HAVE_64BIT_LONG_LONG)
- *#define FNV1_64_INIT ((Fnv64_t)0xcbf29ce484222325ULL)
- *#define FNV1_64A_INIT FNV1_64_INIT
- *#else
- *extern const Fnv64_t fnv1_64_init;
- *extern const Fnv64_t fnv1_64a_init;
- *#define FNV1_64_INIT (fnv1_64_init)
- *#define FNV1_64A_INIT FNV1_64_INIT
- *#endif
- */
 
 /*
  * external functions
  */
-extern Fnv32_t fnv_32_buf(void *buf, size_t len, Fnv32_t hashval);
-extern Fnv32_t fnv_32_str(char *buf, Fnv32_t hashval);
-/* 
- * extern Fnv64_t fnv_64_buf(void *buf, size_t len, Fnv64_t hashval);
- * extern Fnv64_t fnv_64_str(char *buf, Fnv64_t hashval);
- */
-extern Fnv32_t fnv_32a_buf(void *buf, size_t len, Fnv32_t hashval);
-extern Fnv32_t fnv_32a_str(char *buf, Fnv32_t hashval);
-/*
- * extern Fnv64_t fnv_64a_buf(void *buf, size_t len, Fnv64_t hashval);
- * extern Fnv64_t fnv_64a_str(char *buf, Fnv64_t hashval);
- */
+/* hash_32.c */
+extern Fnv32_t fnv32(char *str);
+
+/* hash_32a.c */
+extern Fnv32_t fnv32a(char *str);
+
+/* hash_64.c */
+extern Fnv64_t *fnv64_t(char *str);
+
+/* hash_64a.c */
+extern Fnv64_t *fnv64a_t(char *str);
 
 #endif /* __FNV_H__ */
-

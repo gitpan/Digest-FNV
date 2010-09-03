@@ -1,11 +1,22 @@
 Changes
-FNV.pm
+const-c.inc
+const-xs.inc
+fallback/const-c.inc
+fallback/const-xs.inc
 FNV.xs
 fnvlib/fnv.h
-fnvlib/fnv.c
+fnvlib/hash_32.c
+fnvlib/hash_32a.c
+fnvlib/hash_64.c
+fnvlib/hash_64a.c
 fnvlib/Makefile.PL
+fnvlib/README
+lib/Digest/FNV.pm
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
+META.yml
+ppport.h
 README
+t/fnv32.t
+t/fnv64.t
 typemap
-t/test.t
